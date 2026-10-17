@@ -519,7 +519,7 @@ details summary{cursor:pointer;color:var(--mute);font-size:13px}
 <div class=row><input id=q maxlength=300 placeholder="Search: where is the laptop? when did someone open the door?"><button id=sb>Search</button></div>
 <div class=row><input id=aq maxlength=300 placeholder="Ask the agent anything about the scan"><button id=ab class=alt>Ask</button></div>
 <div class=box id=abox style="display:none"><h2>Agent answer</h2><div id=answer></div></div>
-<div class=box id=rerun><h2>Video in Rerun · 3D reconstruction of this scan</h2><details open><summary>Rerun web viewer (loads the scene .rrd; a few seconds)</summary><iframe id=rr allow="fullscreen" loading=lazy></iframe></details></div>
+<div class=box id=rerun><h2>Video in Rerun · 3D reconstruction of this scan</h2><details id=rrd><summary>Open the Rerun web viewer (loads the scene .rrd; a few seconds)</summary><iframe id=rr allow="fullscreen"></iframe></details></div>
 <div class=box><h2 id=title>Timeline</h2><div class=grid id=grid></div></div>
 </main>
 <script>
@@ -534,7 +534,8 @@ return `<div class="card${hit?' hit':''}"><div class=m>
 <div class=txt>${esc(w.text)}</div><div class=tags>${w.tags.map(([c,n])=>`<span class=tag><b>${esc(c)}</b> ×${esc(n)}</span>`).join('')}</div>${pose}</div></div></div>`}
 function render(ws,title,hit){$('#title').textContent=title;$('#grid').innerHTML=ws.map(w=>card(w,hit)).join('')||'<span class=dim>No results.</span>'}
 async function loadScan(id){scan=id;doc=await (await fetch(`/api/scan/${encodeURIComponent(id)}`)).json();
-const rr=$('#rerun');if(doc.rerun_url&&doc.rerun_url.startsWith('https://app.rerun.io/')){$('#rr').src=doc.rerun_url;rr.style.display='block'}else{rr.style.display='none';$('#rr').src='about:blank'}
+const rr=$('#rerun');$('#rrd').open=false;$('#rr').src='about:blank';
+if(doc.rerun_url&&doc.rerun_url.startsWith('https://app.rerun.io/')){rr.style.display='block';$('#rrd').ontoggle=()=>{if($('#rrd').open&&$('#rr').src!==doc.rerun_url)$('#rr').src=doc.rerun_url}}else{rr.style.display='none'}
 render(doc.windows,`Timeline · ${doc.windows.length} windows · ${doc.duration.toFixed(0)} s · ${doc.n_frames} frames${doc.place?' · '+doc.place:''}${doc.rendered?' · rendered from the 3D splat':''} · ${doc.model.split('/')[1]}`)}
 async function search(){const q=$('#q').value.trim();if(!q)return loadScan(scan);
 const r=await (await fetch(`/api/scan/${encodeURIComponent(scan)}/search?q=${encodeURIComponent(q)}`)).json();render(r,`Results for “${q}”`,true)}
