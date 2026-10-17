@@ -534,7 +534,7 @@ return `<div class="card${hit?' hit':''}"><div class=m>
 <div class=txt>${esc(w.text)}</div><div class=tags>${w.tags.map(([c,n])=>`<span class=tag><b>${esc(c)}</b> ×${esc(n)}</span>`).join('')}</div>${pose}</div></div></div>`}
 function render(ws,title,hit){$('#title').textContent=title;$('#grid').innerHTML=ws.map(w=>card(w,hit)).join('')||'<span class=dim>No results.</span>'}
 async function loadScan(id){scan=id;doc=await (await fetch(`/api/scan/${encodeURIComponent(id)}`)).json();
-const rr=$('#rerun');if(doc.rerun_url&&doc.rerun_url.startsWith('https://app.rerun.io/')){$('#rr').src=doc.rerun_url;rr.style.display=''}else{rr.style.display='none';$('#rr').src='about:blank'}
+const rr=$('#rerun');if(doc.rerun_url&&doc.rerun_url.startsWith('https://app.rerun.io/')){$('#rr').src=doc.rerun_url;rr.style.display='block'}else{rr.style.display='none';$('#rr').src='about:blank'}
 render(doc.windows,`Timeline · ${doc.windows.length} windows · ${doc.duration.toFixed(0)} s · ${doc.n_frames} frames${doc.place?' · '+doc.place:''}${doc.rendered?' · rendered from the 3D splat':''} · ${doc.model.split('/')[1]}`)}
 async function search(){const q=$('#q').value.trim();if(!q)return loadScan(scan);
 const r=await (await fetch(`/api/scan/${encodeURIComponent(scan)}/search?q=${encodeURIComponent(q)}`)).json();render(r,`Results for “${q}”`,true)}
